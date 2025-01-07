@@ -1,28 +1,39 @@
 package com.Eddie.Quiz.controller;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.Eddie.Quiz.dto.request.UserLoginRequest;
+import com.Eddie.Quiz.dto.request.UserRegisterRequest;
+import com.Eddie.Quiz.dto.response.UserRegisterResponse;
+import com.Eddie.Quiz.entity.UserEntity;
+import com.Eddie.Quiz.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 public class AuthController {
-    @GetMapping("/")
-    String test (@AuthenticationPrincipal OAuth2User user) {
-        if(user == null) return "user is null";
-        String name = user.getAttribute("name");
-        String email = user.getAttribute("email");
-        System.out.println(name);
-        return "hello " + name;
+    @Autowired
+    private AuthService authService;
+    @GetMapping("/auth/verifier/{token}")
+    ResponseEntity<?> verifierToken(@PathVariable String token) {
+        return ResponseEntity.ok(authService.verifierToken(token));
     }
 
-    @GetMapping("/test")
-    String test2 (@AuthenticationPrincipal OAuth2User user) {
-        if(user == null) return "user is null";
-        String name = user.getAttribute("name");
-        String email = user.getAttribute("email");
-        String url = user.getAttribute("picture");
-        System.out.println(name);
-        return "chúc mừng bạn đã đăng nhập thành công với email : " + email + " anh đại diện của bạn là: " + url;
+    @PostMapping("/auth/login")
+    ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
+        String token = authService.login(request);
+        return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/auth/register")
+    ResponseEntity<?> register(@RequestBody UserRegisterRequest request){
+        UserRegisterResponse response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    @GetMapping("/auth/my-info")
+    ResponseEntity<?> getMyInfo(){
+        UserEntity user = authService.getMyInfo();
+        return ResponseEntity.ok().body(user);
     }
 }

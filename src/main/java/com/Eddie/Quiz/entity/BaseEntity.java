@@ -19,5 +19,5 @@ public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Date creationDate;
+    Date creationDate = new Date();
 }
