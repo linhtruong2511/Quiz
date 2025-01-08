@@ -2,6 +2,7 @@ package com.Eddie.Quiz.controller;
 
 import com.Eddie.Quiz.dto.request.UserLoginRequest;
 import com.Eddie.Quiz.dto.request.UserRegisterRequest;
+import com.Eddie.Quiz.dto.response.ResponseAPI;
 import com.Eddie.Quiz.dto.response.UserRegisterResponse;
 import com.Eddie.Quiz.entity.UserEntity;
 import com.Eddie.Quiz.service.AuthService;
@@ -20,10 +21,14 @@ public class AuthController {
         return ResponseEntity.ok(authService.verifierToken(token));
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/auth/username-login")
     ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
         String token = authService.login(request);
-        return ResponseEntity.ok(token);
+        ResponseAPI<String> responseAPI = ResponseAPI.<String>builder()
+                .data(token)
+                .status(HttpStatus.OK.name())
+                .build();
+        return ResponseEntity.ok(responseAPI);
     }
 
     @PostMapping("/auth/register")
@@ -34,6 +39,11 @@ public class AuthController {
     @GetMapping("/auth/my-info")
     ResponseEntity<?> getMyInfo(){
         UserEntity user = authService.getMyInfo();
-        return ResponseEntity.ok().body(user);
+        ResponseAPI<UserEntity> responseAPI = ResponseAPI.<UserEntity>builder()
+                .data(user)
+                .status(HttpStatus.OK.toString())
+                .build();
+
+        return ResponseEntity.ok().body(responseAPI);
     }
 }
